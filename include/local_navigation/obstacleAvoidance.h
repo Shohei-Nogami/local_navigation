@@ -30,7 +30,8 @@ class obstacleAvoidance{
 		ros::NodeHandle nhSub1;
 		ros::Subscriber sub1,sub2,sub3,sub4;
     	local_navigation::ClassificationVelocityData clstr;//速度データ付きのクラスタデータ
-        nav_msgs::Odometry robotOdom,goalOdom,relationOdom;
+    	local_navigation::ClassificationVelocityData rotClstr;
+        nav_msgs::Odometry robotOdom,pre_robotOdom,deltaRobotOdom,goalOdom,relationOdom;
         beego_control::beego_encoder robotEncoder;
         //送信データ
 		ros::NodeHandle nhPub;
@@ -77,6 +78,7 @@ class obstacleAvoidance{
         // デバッグ用
 		ros::NodeHandle nhDeb;
         ros::Publisher pubDebPcl,pubDebCross,pubDebMarkerArray, pubDebHst,pubDebOutput,pubDebCPVFHOutput,pubDebBagOutput;
+        ros::Publisher pubDebRotOutput,pubDebOdom;
         int debugType;
         //カラーリスト
         float colors[12][3] ={{1.0,0,1.0},{1.0,1.0,0},{0,1.0,1.0},{1.0,0,0},{0,1.0,0},{0,0,1.0},{0.5,1.0,0},{0,0.5,1.0},{0.5,0,1.0},{1.0,0.5,0},{0,1.0,0.5},{1.0,0,0.5}};//色リスト
@@ -132,6 +134,8 @@ class obstacleAvoidance{
         float debugObstacleSizeThreshold;
         geometry_msgs::Point debugGp1,debugGp2,debugGp3;//クラスタ重心
         geometry_msgs::Twist debugTwist1,debugTwist2,debugTwist3;//障害物速度
+        bool debugRotationVelocityCheckerFlag;
+        double debugRotOmega;
         //交差位値表示
         bool display_output;
         //--rqt_reconfigure
@@ -169,6 +173,8 @@ class obstacleAvoidance{
         void data_check_reset();
         void get_time();
         bool culc_delta_time();
+        void culc_delta_robotOdom();
+        void trans_rotation_vel(double& v_rot_x, double& v_rot_y, const double& x_para_x,const double& x_para_y,const double& x_para_vx,const double& x_para_vy);
         crossPoint getCrossPoint(int& cp_num, std::vector<crossPoint>& crsPts, int& indexRef,geometry_msgs::Point& gpRef, geometry_msgs::Twist& twistRef, float& cur_vel, float& cmd_dV, float& cmd_dAng);
         void getCrossPoints(crossPoint& crsPt_x0, crossPoint& crsPt_y0, int& indexRef,geometry_msgs::Point& gpRef, geometry_msgs::Twist& twistRef, float& cur_vel, float& cur_ang, float& cmd_dV, float& cmd_ang);
         void getCrossPoints(crossPoint& crsPt_x0, crossPoint& crsPt_y0, int& indexRef, const local_navigation::ClassificationElement& clst_data, geometry_msgs::Twist& twistRef, float& cur_vel, float& cur_ang, float& cmd_dV, float& cmd_ang);
@@ -203,5 +209,10 @@ class obstacleAvoidance{
         void histgramChecker();
         void outputVFHChecker();
         void outputCrossPointVFHChecker();
+        void histgramCheckerEx();
+        void rotationVelocityChecker();
+        void publish_deltaRobotOdom();
+        void rotationVelocityChecker(double omega);
+        void debug_trans_rotation_vel(double& v_rot_x, double& v_rot_y, const double& x_para_x,const double& x_para_y,const double& x_para_theta,const double& x_para_vx,const double& x_para_vy, const double& omega_base);
 };
 #endif

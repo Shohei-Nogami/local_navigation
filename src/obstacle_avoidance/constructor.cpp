@@ -23,7 +23,8 @@ obstacleAvoidance::obstacleAvoidance()
 	pubDebOutput = nhDeb.advertise<visualization_msgs::MarkerArray>("outputChecker", 1);
 	pubDebCPVFHOutput = nhDeb.advertise<visualization_msgs::MarkerArray>("outputCPVFHChecker", 1);
 	pubDebBagOutput = nhDeb.advertise<visualization_msgs::MarkerArray>("outputBagOutputChecker", 1);
-
+	pubDebRotOutput = nhDeb.advertise<visualization_msgs::MarkerArray>("RotChecker", 1);
+	pubDebOdom = nhDeb.advertise<nav_msgs::Odometry>("DeltaOdomChecker", 1);
 	//launchファイルからパラメータの読み込み
 	setLaunchParam();
 	//クロスポイントチェッカーデフォルト値入力

@@ -20,7 +20,8 @@ void obstacleAvoidance::setLaunchParam(){
     goalOdom.pose.pose.position.z = 0;
     RECEIVED_GOAL_ODOM = true;//検討中
     //vfh
-    //--k
+    n.getParam("obstacleAvoidance/distance_th", dis_th);
+	//--k
     n.getParam("obstacleAvoidance/marginRadius", marginRadius);
 	n.getParam("obstacleAvoidance/Kcp",k_cp);
     n.getParam("obstacleAvoidance/Kg",k_g);
@@ -87,7 +88,6 @@ void obstacleAvoidance::configCallback(local_navigation::obstacleAvoidanceConfig
     if(debugFlag_crossPointChecker){
         crossPointChecker();
     }
-
     //ヒストグラムチェッカー
     debugHistgramCheckerFlag = config.debugHistgramCheckerFlag;
     debugObstacleNum = config.debugObstacleNum;
@@ -124,6 +124,8 @@ void obstacleAvoidance::configCallback(local_navigation::obstacleAvoidanceConfig
     debugGoalPosY = config.debugGoalPosY;
     debugCurAng = config.debugCurAng;
     debugPrevTagAng = config.debugPrevTagAng;
+    // 
+    debugRotOmega =config.debugRotOmega;
     if(debugOutputVFHCheckerFlag){
        outputVFHChecker();
     }
@@ -175,6 +177,9 @@ void obstacleAvoidance::configCallback(local_navigation::obstacleAvoidanceConfig
     }
     //交差位置の表示有無
     display_output = config.displayOutput;
+    //
+    debugRotationVelocityCheckerFlag = config.debugRotationVelocityCheckerFlag;
+    
 }
 
 void obstacleAvoidance::setDefaultCrossPointChecker(){
