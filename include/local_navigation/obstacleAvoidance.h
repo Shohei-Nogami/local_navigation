@@ -210,7 +210,6 @@ class obstacleAvoidance{
         void outputVFHChecker();
         void outputCrossPointVFHChecker();
         void histgramCheckerEx();
-        void rotationVelocityChecker();
         void publish_deltaRobotOdom();
         void rotationVelocityChecker(double omega);
         void debug_trans_rotation_vel(double& v_rot_x, double& v_rot_y, const double& x_para_x,const double& x_para_y,const double& x_para_theta,const double& x_para_vx,const double& x_para_vy, const double& omega_base);

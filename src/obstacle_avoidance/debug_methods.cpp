@@ -1149,94 +1149,6 @@ void obstacleAvoidance::outputCrossPointVFHChecker(){
 
 }   
 //回転による障害物速度の変化量を回転変化前と変化後を比較することで行う
-void obstacleAvoidance::rotationVelocityChecker(){
-    //clstr: 障害物クラスタ（ロボット座標系(時刻t)）
-    //rotClstr: 障害物クラスタ（ロボット座標系(時刻t)）
-    //
-    //平行移動
-    //X_para = X - X_base (X ={x,y,th,vx,vy})
-    //しかし,今回はX_baseがロボット座標であるため, 
-    //X_para = X
-    //となる
-    //X_baseは基準座標であり, 今回変更したい座標の基準であるため
-    //X_base={0,0,M_PI_2,0,0} (ロボット座標系)
-    //
-    //回転移動
-    //X_rot = R(-delta_theta) X_para
-    //
-    //これにより, ロボット回転による障害物の速度が算出される
-    //計算をロボット座標系基準で行う
-    //クラスタのコピー
-    rotClstr = clstr;
-    //
-    visualization_msgs::MarkerArray markerArray;
-    visualization_msgs::Marker marker;
-    marker.header.frame_id = "base_link";
-    marker.header.stamp = clstr.header.stamp;
-    marker.lifetime = ros::Duration(0.3);
-    marker.action = visualization_msgs::Marker::ADD;
-    markerArray.markers.resize((int)clstr.data.size()*2);
-    
-    int count = 0;
-    for(int k=0;k < clstr.data.size();k++){
-        double v_rot_x, v_rot_y;
-        double x_para_x = clstr.data[k].gc.x;
-        double x_para_y = clstr.data[k].gc.y;
-        double x_para_theta = std::atan2(clstr.data[k].gc.y,clstr.data[k].gc.x)-M_PI_2;
-        
-        double x_para_vx = clstr.twist[k].linear.x;
-        double x_para_vy = clstr.twist[k].linear.y;
-        //回転算出
-        debug_trans_rotation_vel(v_rot_x,v_rot_y,x_para_x,x_para_y,x_para_theta,x_para_vx, x_para_vy,omega);
-        //
-        rotClstr.twist[k].linear.x += v_rot_x;
-        rotClstr.twist[k].linear.y += v_rot_y;
-        //
-        marker.ns = "obstacle_vec";
-        marker.type = visualization_msgs::Marker::ARROW;
-        marker.scale.x = 0.4;
-        marker.scale.y = 0.05;
-        marker.scale.z = 0.05;
-        // local -> rviz 
-        marker.pose.position.x = clstr.data[k].gc.y;
-        marker.pose.position.y = -clstr.data[k].gc.x;
-        marker.pose.position.z = clstr.data[k].gc.z;
-        //angle
-        double yaw = std::atan2(-clstr.twist[k].linear.x, clstr.twist[k].linear.y);
-        if(clstr.twist[k].linear.x==0 && clstr.twist[k].linear.y ==0){
-            marker.type = visualization_msgs::Marker::SPHERE;
-            marker.scale.x = 0.3;
-            marker.scale.y = 0.3;
-            marker.scale.z = 0.5;   
-            yaw = 0;
-        }
-        //culc Quaternion
-        marker.pose.orientation = tf::createQuaternionMsgFromYaw(yaw);
-        marker.id = count;
-        marker.color.a = 1.0;
-        marker.color.r = 1.0;
-        marker.color.g = 1.0;
-        marker.color.b = 1.0;
-        markerArray.markers[count++] = marker;
-        //
-        marker.ns = "obstacle_rotVel";
-        double yawRot = std::atan2(-rotClstr.twist[k].linear.x, rotClstr.twist[k].linear.y);
-        //
-        //culc Quaternion
-        marker.pose.orientation = tf::createQuaternionMsgFromYaw(yawRot);
-        marker.id = count;
-        marker.color.a = 1.0;
-        marker.color.r = 0;
-        marker.color.g = 1.0;
-        marker.color.b = 0;
-        markerArray.markers[count++] = marker;
-    }
-    //
-    // markerArray.markers.resize(count);
-    // if(markerArray.markers.size()){
-    //     pubDebRotOutput.publish( markerArray );
-    // }
-}
 void obstacleAvoidance::rotationVelocityChecker(double omega){
     //clstr: 障害物クラスタ（ロボット座標系(時刻t)）
     //rotClstr: 障害物クラスタ（ロボット座標系(時刻t)）
@@ -1308,7 +1220,7 @@ void obstacleAvoidance::rotationVelocityChecker(double omega){
         marker.color.b = 1.0;
         markerArray.markers[count++] = marker;
         //
-        marker.ns = "obstacle_rotVel_self";
+        marker.ns = "obstacle_difVel_self";
         std::cout<<k<<","<<x_para_theta*180/M_PI<<":bef,rot:("<<clstr.twist[k].linear.x<<","<<clstr.twist[k].linear.y<<"),("<<rotClstr.twist[k].linear.x<<","<<rotClstr.twist[k].linear.y<<")"<<std::endl;
         double yawRot = std::atan2(-rotClstr.twist[k].linear.x, rotClstr.twist[k].linear.y);
         std::cout<<k<<","<<x_para_theta*180/M_PI<<":bef,rot:("<<std::atan2(clstr.twist[k].linear.y, clstr.twist[k].linear.x)<<","<<std::atan2(rotClstr.twist[k].linear.y, rotClstr.twist[k].linear.x)<<std::endl;
@@ -1324,6 +1236,7 @@ void obstacleAvoidance::rotationVelocityChecker(double omega){
         markerArray.markers[count++] = marker;
         //
         //rot
+        marker.ns = "obstacle_rotVel_self";
         double yawRotVel = std::atan2(-v_rot_x, v_rot_y);
         marker.pose.orientation = tf::createQuaternionMsgFromYaw(yawRotVel);
         marker.id = count;

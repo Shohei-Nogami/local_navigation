@@ -99,9 +99,6 @@ void obstacleAvoidance::update_goal_position(){
 }
 void obstacleAvoidance::manage(){
 	ROS_INFO("into manage");
-	if(debugRotationVelocityCheckerFlag){
-		rotationVelocityChecker(debugRotOmega);
-	}
 	if(data_check()){
 		data_check_reset();
 		get_time();
@@ -109,6 +106,8 @@ void obstacleAvoidance::manage(){
 			pre_robotOdom = robotOdom;
 			return;
 		}
+		//ロボットグローバル速度算出
+		culc_delta_robotOdom();
 		//現在地とゴール位置の位置関係更新
 		update_goal_position();
 		//ヒストグラム作成
@@ -131,7 +130,9 @@ void obstacleAvoidance::manage(){
 		ROS_INFO("debug");
 		publish_deltaRobotOdom();
 		debug();
-		
+		if(debugRotationVelocityCheckerFlag){
+			rotationVelocityChecker(debugRotOmega);
+		}		
 	}
 }
 bool obstacleAvoidance::data_check(){
@@ -159,8 +160,6 @@ bool obstacleAvoidance::culc_delta_time(){
 		delta_time_ros = cur_time - pre_time;
 		delta_time = delta_time_ros.toSec();
 		pre_time = cur_time;
-		//ロボットグローバル速度算出
-		culc_delta_robotOdom();
 		//
 		PROCESS_ONCE = false;
 		return true;
@@ -193,11 +192,12 @@ void obstacleAvoidance::culc_delta_robotOdom(){
 	//
 	tf::Quaternion quatTheta=tf::createQuaternionFromYaw(delta_theta);//debugRobotYaw-M_PI_2);
 	quaternionTFToMsg(quatTheta, deltaRobotOdom.pose.pose.orientation);
-	
+	ROS_INFO("omega=%f",omega);
 	deltaRobotOdom.twist.twist.angular.x = 0;
 	deltaRobotOdom.twist.twist.angular.y = 0;
 	deltaRobotOdom.twist.twist.angular.z = omega;
 	
+	pre_robotOdom = robotOdom;
 
 }
 // 障害物が接近障害物か判断
@@ -813,8 +813,6 @@ void obstacleAvoidance::create_histgram(){
 			vfh_c.add_histgram_dis(angleTemp, disTemp);
 		}
 	}
-	//オドメトリ更新
-	pre_robotOdom = robotOdom;
 }
 void obstacleAvoidance::create_binary_histgram(float& robotRadius, float& marginRadius){
 	vfh_c.create_binary_histgram(robotRadius,marginRadius);
