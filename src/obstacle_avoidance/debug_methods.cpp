@@ -1259,7 +1259,7 @@ void obstacleAvoidance::rotationVelocityChecker(double omega){
 }
 void obstacleAvoidance::publish_deltaRobotOdom(){
     //deltaRobotOdom
-    pubDebOdom.publish(deltaRobotOdom);
+    pubDebOdom.publish(deltaRobotOdom);/
 }
 void obstacleAvoidance::trans_rotation_vel(double& v_rot_x, double& v_rot_y, const double& x_para_x,const double& x_para_y,const double& x_para_vx,const double& x_para_vy){
     //変数作成
