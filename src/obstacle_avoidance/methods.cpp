@@ -131,7 +131,8 @@ void obstacleAvoidance::manage(){
 		publish_deltaRobotOdom();
 		debug();
 		if(debugRotationVelocityCheckerFlag){
-			rotationVelocityChecker(debugRotOmega);
+			// rotationVelocityChecker(debugRotOmega);
+			rotationVelocityChecker(deltaRobotOdom.twist.twist.angular.z);
 		}		
 	}
 }
