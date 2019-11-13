@@ -289,9 +289,11 @@ void obstacleAvoidance::getCrossPoints(crossPoint& crsPt_x0, crossPoint& crsPt_y
 	double v_rot_x, v_rot_y;
 	double x_para_x = gpRef.x;
 	double x_para_y = gpRef.y;
+	double x_para_theta = std::atan2(gpRef.y, gpRef.x)-M_PI_2;
 	double x_para_vx = twistRef.linear.x;
 	double x_para_vy = twistRef.linear.y;
-	trans_rotation_vel(v_rot_x,v_rot_y,x_para_x,x_para_y,x_para_vx, x_para_vy);
+	double omega = deltaRobotOdom.twist.twist.angular.z;
+	debug_trans_rotation_vel(v_rot_x,v_rot_y,x_para_x,x_para_y,x_para_theta,x_para_vx, x_para_vy,omega);
 	//
 	// 速度
 	float Vox = twistRef.linear.x + Vrx + v_rot_x;
