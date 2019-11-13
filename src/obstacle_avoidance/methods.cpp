@@ -124,12 +124,13 @@ void obstacleAvoidance::manage(){
 		searchProcess(tagVel, tagAng);
 		ROS_INFO_STREAM("target vel =" <<tagVel<<"\n"<< "target angle =" <<tagAng);
 		//命令速度生成
+		// tagVel=0;
 		geometry_msgs::Twist cmd = controler(tagVel, tagAng);
 		ROS_INFO_STREAM("publishData = \n" <<cmd);
 		publishData(cmd);
 		ROS_INFO("debug");
 		publish_deltaRobotOdom();
-		debug();
+		// debug();
 		if(debugRotationVelocityCheckerFlag){
 			rotationVelocityChecker(debugRotOmega);
 		}		
@@ -294,8 +295,8 @@ void obstacleAvoidance::getCrossPoints(crossPoint& crsPt_x0, crossPoint& crsPt_y
 	trans_rotation_vel(v_rot_x,v_rot_y,x_para_x,x_para_y,x_para_vx, x_para_vy);
 	//
 	// 速度
-	float Vox = twistRef.linear.x + Vrx + v_rot_x;
-	float Voy = twistRef.linear.y + Vry + v_rot_y;
+	float Vox = v_rot_x+ Vrx;//twistRef.linear.x + Vrx - v_rot_x;
+	float Voy = v_rot_y+ Vry;//twistRef.linear.y + Vry - v_rot_y;
 	//回転
 	tf::Quaternion quat;
 	double r_cur,p_cur,y_cur;
@@ -448,13 +449,13 @@ double obstacleAvoidance::getNearestDistance(crossPoint& crsPt, const local_navi
 void obstacleAvoidance::crossPointsDetect(std::vector<crossPoint>& crsPts, float& cur_vel_temp, float& cur_angle_temp, float& cmd_dV, float& cmd_dAng){
 	//-before edit
 	crsPts.resize((int)clstr.data.size()*2);
-	// for(int k=0; k<clstr.data.size(); k++){
-	// 	getCrossPoints(crsPts[k*2], crsPts[k*2+1], k, clstr.data[k], clstr.twist[k],cur_vel_temp,  cur_angle_temp, cmd_dV,cmd_dAng);
-	// }
+	for(int k=0; k<clstr.data.size(); k++){
+		getCrossPoints(crsPts[k*2], crsPts[k*2+1], k, clstr.data[k], clstr.twist[k],cur_vel_temp,  cur_angle_temp, cmd_dV,cmd_dAng);
+	}
 	//-after edit
 	// crsPts.resize((int)clstr.data.size()*2);
 	int count = 0;
-	for(int k=0; k<clstr.data.size(); k++){
+	// for(int k=0; k<clstr.data.size(); k++){
 	// 	//静止障害物のみADD
 	// 	// double Vrx = cur_vel * cos( cur_angVel*delta_time*M_PI/180);
 	// 	// double Vry = cur_vel * sin( prev_tagAng*delta_time*M_PI/180);
@@ -469,33 +470,33 @@ void obstacleAvoidance::crossPointsDetect(std::vector<crossPoint>& crsPts, float
 	// 	// double Vdif_y = Vry + clstr.twist[k].linear.y;
 	// 	//
 	// 	//グローバル座標系での速度を算出
-		double vxr_r = cur_vel * sin( cur_angVel*delta_time*M_PI/180+M_PI_2);
-		double vyr_r = -cur_vel * cos( cur_angVel*delta_time*M_PI/180+M_PI_2);
-		double xr_o = clstr.data[k].gc.y;
-		double yr_o = -clstr.data[k].gc.x;
-		//
-		double vxr_o = clstr.twist[k].linear.y;// + vxr_r;
-		double vyr_o = -clstr.twist[k].linear.x;// + vyr_r;
-		double yaw = std::atan2(robotOdom.pose.pose.position.y,robotOdom.pose.pose.position.x);
-		//v rotation
-		double vx_og = -cur_angVel*sin(yaw)*xr_o + cos(yaw)*vxr_o
-						- cur_angVel*cos(yaw)*yr_o - sin(yaw)*vyr_o;
+		// double vxr_r = cur_vel * sin( cur_angVel*delta_time*M_PI/180+M_PI_2);
+		// double vyr_r = -cur_vel * cos( cur_angVel*delta_time*M_PI/180+M_PI_2);
+		// double xr_o = clstr.data[k].gc.y;
+		// double yr_o = -clstr.data[k].gc.x;
+		// //
+		// double vxr_o = clstr.twist[k].linear.y;// + vxr_r;
+		// double vyr_o = -clstr.twist[k].linear.x;// + vyr_r;
+		// double yaw = std::atan2(robotOdom.pose.pose.position.y,robotOdom.pose.pose.position.x);
+		// //v rotation
+		// double vx_og = -cur_angVel*sin(yaw)*xr_o + cos(yaw)*vxr_o
+		// 				- cur_angVel*cos(yaw)*yr_o - sin(yaw)*vyr_o;
 		
-		double vy_og = cur_angVel*cos(yaw)*xr_o + sin(yaw)*vxr_o 
-						- cur_angVel*sin(yaw)*yr_o + cos(yaw)*vyr_o;		
-		//v linear
-		double vxr_g = vxr_o * cos(yaw) - vyr_o * sin(yaw);
-		double vyr_g = vxr_o * sin(yaw) + vyr_o * cos(yaw);
-		// ROS_INFO("k: R= %f,%f, O = %f, %f, Rot = %f, %f",-vyr_r,vxr_r, clstr.twist[k].linear.x, clstr.twist[k].linear.y, -vyr_g,vxr_g);
+		// double vy_og = cur_angVel*cos(yaw)*xr_o + sin(yaw)*vxr_o 
+		// 				- cur_angVel*sin(yaw)*yr_o + cos(yaw)*vyr_o;		
+		// //v linear
+		// double vxr_g = vxr_o * cos(yaw) - vyr_o * sin(yaw);
+		// double vyr_g = vxr_o * sin(yaw) + vyr_o * cos(yaw);
+		// // ROS_INFO("k: R= %f,%f, O = %f, %f, Rot = %f, %f",-vyr_r,vxr_r, clstr.twist[k].linear.x, clstr.twist[k].linear.y, -vyr_g,vxr_g);
 		
-		if(clstr.twist[k].linear.x !=0 || clstr.twist[k].linear.y != 0
-			&& std::sqrt(std::pow(-vyr_g,2.0)+std::pow(vxr_g,2.0)) > 0.1
-			){
-				getCrossPoints(crsPts[count*2], crsPts[count*2+1], count, clstr.data[count], clstr.twist[count],cur_vel_temp,  cur_angle_temp, cmd_dV,cmd_dAng);
-				count++;
-		}
-	}
-	crsPts.resize(count);
+		// if(clstr.twist[k].linear.x !=0 || clstr.twist[k].linear.y != 0
+		// 	// && std::sqrt(std::pow(-vyr_g,2.0)+std::pow(vxr_g,2.0)) > 0.1
+		// 	){
+		// 		getCrossPoints(crsPts[count*2], crsPts[count*2+1], count, clstr.data[count], clstr.twist[count],cur_vel_temp,  cur_angle_temp, cmd_dV,cmd_dAng);
+		// 		count++;
+		// }
+	// }
+	// crsPts.resize(count);
 }
 //--コスト関数
 double obstacleAvoidance::costCrossPoint(crossPoint& crsPt, float eta_cp){

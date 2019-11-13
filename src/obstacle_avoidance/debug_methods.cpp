@@ -1189,8 +1189,8 @@ void obstacleAvoidance::rotationVelocityChecker(double omega){
         //回転算出
         debug_trans_rotation_vel(v_rot_x,v_rot_y,x_para_x,x_para_y,x_para_theta,x_para_vx, x_para_vy,omega);
         //
-        rotClstr.twist[k].linear.x += v_rot_x;
-        rotClstr.twist[k].linear.y += v_rot_y;
+        rotClstr.twist[k].linear.x -= v_rot_x;
+        rotClstr.twist[k].linear.y -= v_rot_y;
         //
         marker.ns = "obstacle_vec_self";
         marker.type = visualization_msgs::Marker::ARROW;
@@ -1259,7 +1259,7 @@ void obstacleAvoidance::rotationVelocityChecker(double omega){
 }
 void obstacleAvoidance::publish_deltaRobotOdom(){
     //deltaRobotOdom
-    pubDebOdom.publish(deltaRobotOdom);/
+    pubDebOdom.publish(deltaRobotOdom);
 }
 void obstacleAvoidance::trans_rotation_vel(double& v_rot_x, double& v_rot_y, const double& x_para_x,const double& x_para_y,const double& x_para_vx,const double& x_para_vy){
     //変数作成
