@@ -129,6 +129,7 @@ void obstacleAvoidance::manage(){
 		ROS_INFO_STREAM("publishData = \n" <<cmd);
 		publishData(cmd);
 		ROS_INFO("debug");
+		publish_deltaRobotOdom();
 		debug();
 		
 	}
@@ -185,7 +186,7 @@ void obstacleAvoidance::culc_delta_robotOdom(){
 	quaternionMsgToTF(robotOdom.pose.pose.orientation, quat);
 	tf::Matrix3x3(quat).getRPY(r_cur,p_cur,y_cur);
 	double r_pre,p_pre,y_pre;
-	quaternionMsgToTF(robotOdom.pose.pose.orientation, quat);
+	quaternionMsgToTF(pre_robotOdom.pose.pose.orientation, quat);
 	tf::Matrix3x3(quat).getRPY(r_pre,p_pre,y_pre);
 	double delta_theta = y_cur - y_pre;
 	double omega = delta_theta/( ros::Duration(robotOdom.header.stamp - pre_robotOdom.header.stamp).toSec() );

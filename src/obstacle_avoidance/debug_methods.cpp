@@ -1182,19 +1182,21 @@ void obstacleAvoidance::rotationVelocityChecker(){
         double v_rot_x, v_rot_y;
         double x_para_x = clstr.data[k].gc.x;
         double x_para_y = clstr.data[k].gc.y;
+        double x_para_theta = std::atan2(clstr.data[k].gc.y,clstr.data[k].gc.x)-M_PI_2;
+        
         double x_para_vx = clstr.twist[k].linear.x;
         double x_para_vy = clstr.twist[k].linear.y;
         //回転算出
-        trans_rotation_vel(v_rot_x,v_rot_y,x_para_x,x_para_y,x_para_vx, x_para_vy);
+        debug_trans_rotation_vel(v_rot_x,v_rot_y,x_para_x,x_para_y,x_para_theta,x_para_vx, x_para_vy,omega);
         //
         rotClstr.twist[k].linear.x += v_rot_x;
         rotClstr.twist[k].linear.y += v_rot_y;
         //
         marker.ns = "obstacle_vec";
         marker.type = visualization_msgs::Marker::ARROW;
-        marker.scale.x = 0.3;
-        marker.scale.y = 0.1;
-        marker.scale.z = 0.1;
+        marker.scale.x = 0.4;
+        marker.scale.y = 0.05;
+        marker.scale.z = 0.05;
         // local -> rviz 
         marker.pose.position.x = clstr.data[k].gc.y;
         marker.pose.position.y = -clstr.data[k].gc.x;
@@ -1211,6 +1213,10 @@ void obstacleAvoidance::rotationVelocityChecker(){
         //culc Quaternion
         marker.pose.orientation = tf::createQuaternionMsgFromYaw(yaw);
         marker.id = count;
+        marker.color.a = 1.0;
+        marker.color.r = 1.0;
+        marker.color.g = 1.0;
+        marker.color.b = 1.0;
         markerArray.markers[count++] = marker;
         //
         marker.ns = "obstacle_rotVel";
@@ -1219,13 +1225,17 @@ void obstacleAvoidance::rotationVelocityChecker(){
         //culc Quaternion
         marker.pose.orientation = tf::createQuaternionMsgFromYaw(yawRot);
         marker.id = count;
+        marker.color.a = 1.0;
+        marker.color.r = 0;
+        marker.color.g = 1.0;
+        marker.color.b = 0;
         markerArray.markers[count++] = marker;
     }
     //
-    markerArray.markers.resize(count);
-    if(markerArray.markers.size()){
-        pubDebRotOutput.publish( markerArray );
-    }
+    // markerArray.markers.resize(count);
+    // if(markerArray.markers.size()){
+    //     pubDebRotOutput.publish( markerArray );
+    // }
 }
 void obstacleAvoidance::rotationVelocityChecker(double omega){
     //clstr: 障害物クラスタ（ロボット座標系(時刻t)）
@@ -1253,11 +1263,10 @@ void obstacleAvoidance::rotationVelocityChecker(double omega){
     marker.header.stamp = clstr.header.stamp;
     marker.lifetime = ros::Duration(0.3);
     marker.action = visualization_msgs::Marker::ADD;
-    markerArray.markers.resize((int)clstr.data.size()*2);
+    markerArray.markers.resize((int)clstr.data.size()*4);
     
     int count = 0;
     for(int k=0;k < clstr.data.size();k++){
-        //tf座標系に
         double v_rot_x, v_rot_y;
         double x_para_x = clstr.data[k].gc.x;
         double x_para_y = clstr.data[k].gc.y;
@@ -1271,11 +1280,11 @@ void obstacleAvoidance::rotationVelocityChecker(double omega){
         rotClstr.twist[k].linear.x += v_rot_x;
         rotClstr.twist[k].linear.y += v_rot_y;
         //
-        marker.ns = "obstacle_vec";
+        marker.ns = "obstacle_vec_self";
         marker.type = visualization_msgs::Marker::ARROW;
         marker.scale.x = 0.3;
-        marker.scale.y = 0.1;
-        marker.scale.z = 0.1;
+        marker.scale.y = 0.05;
+        marker.scale.z = 0.05;
         // local -> rviz 
         marker.pose.position.x = clstr.data[k].gc.y;
         marker.pose.position.y = -clstr.data[k].gc.x;
@@ -1299,7 +1308,7 @@ void obstacleAvoidance::rotationVelocityChecker(double omega){
         marker.color.b = 1.0;
         markerArray.markers[count++] = marker;
         //
-        marker.ns = "obstacle_rotVel";
+        marker.ns = "obstacle_rotVel_self";
         std::cout<<k<<","<<x_para_theta*180/M_PI<<":bef,rot:("<<clstr.twist[k].linear.x<<","<<clstr.twist[k].linear.y<<"),("<<rotClstr.twist[k].linear.x<<","<<rotClstr.twist[k].linear.y<<")"<<std::endl;
         double yawRot = std::atan2(-rotClstr.twist[k].linear.x, rotClstr.twist[k].linear.y);
         std::cout<<k<<","<<x_para_theta*180/M_PI<<":bef,rot:("<<std::atan2(clstr.twist[k].linear.y, clstr.twist[k].linear.x)<<","<<std::atan2(rotClstr.twist[k].linear.y, rotClstr.twist[k].linear.x)<<std::endl;
@@ -1307,9 +1316,24 @@ void obstacleAvoidance::rotationVelocityChecker(double omega){
         //culc Quaternion
         marker.pose.orientation = tf::createQuaternionMsgFromYaw(yawRot);
         marker.id = count;
+        marker.pose.position.z = clstr.data[k].gc.z+0.2;
         marker.color.a = 1.0;
         marker.color.r = 1.0;
         marker.color.g = 0;
+        marker.color.b = 0;
+        markerArray.markers[count++] = marker;
+        //
+        //rot
+        double yawRotVel = std::atan2(-v_rot_x, v_rot_y);
+        marker.pose.orientation = tf::createQuaternionMsgFromYaw(yawRotVel);
+        marker.id = count;
+        marker.pose.position.z = clstr.data[k].gc.z+0.4;
+        marker.scale.x = 0.3;
+        marker.scale.y = 0.05;
+        marker.scale.z = 0.05;
+        marker.color.a = 1.0;
+        marker.color.r = 0.0;
+        marker.color.g = 1;
         marker.color.b = 0;
         markerArray.markers[count++] = marker;
     }
