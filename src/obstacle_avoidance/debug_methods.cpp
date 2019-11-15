@@ -1175,22 +1175,47 @@ void obstacleAvoidance::rotationVelocityChecker(double omega){
     marker.header.stamp = clstr.header.stamp;
     marker.lifetime = ros::Duration(0.3);
     marker.action = visualization_msgs::Marker::ADD;
-    markerArray.markers.resize((int)clstr.data.size()*4);
+    markerArray.markers.resize((int)clstr.data.size()*5);
     
     int count = 0;
     for(int k=0;k < clstr.data.size();k++){
         double v_rot_x, v_rot_y;
         double x_para_x = clstr.data[k].gc.x;
         double x_para_y = clstr.data[k].gc.y;
-        double x_para_theta = std::atan2(clstr.data[k].gc.y,clstr.data[k].gc.x)-M_PI_2;
+        //double x_para_theta = std::atan2(clstr.data[k].gc.y,clstr.data[k].gc.x)-M_PI_2;
+        //
+        double delta_r,delta_p,delta_yaw;
+        tf::Quaternion quat_rot;
+        quaternionMsgToTF(deltaRobotOdom.pose.pose.orientation, quat_rot);
+        tf::Matrix3x3(quat_rot).getRPY(delta_r,delta_p,delta_yaw);
+        //
+        double x_para_theta = delta_yaw;//std::atan2(gpRef.y,gpRef.x)-M_PI_2;
         
         double x_para_vx = clstr.twist[k].linear.x;
         double x_para_vy = clstr.twist[k].linear.y;
         //回転算出
-        debug_trans_rotation_vel(v_rot_x,v_rot_y,x_para_x,x_para_y,x_para_theta,x_para_vx, x_para_vy,omega);
+        // debug_trans_rotation_vel(v_rot_x,v_rot_y,x_para_x,x_para_y,x_para_theta,x_para_vx, x_para_vy,omega);
+        //        
+        double pos_x = clstr.data[k].gc.x;
+        double pos_y = clstr.data[k].gc.y;
+        double vel_x = clstr.twist[k].linear.x;
+        double vel_y = clstr.twist[k].linear.y;
+        double vr_x = cur_vel * cos(cur_angVel*delta_time+M_PI_2);//*delta_time);
+        double vr_y = cur_vel * sin(cur_angVel*delta_time+M_PI_2);//*delta_time);
+        double delta_pos_x = pos_x + cos(delta_yaw)*(vel_x*delta_time - pos_x + vr_x*delta_time) + sin(delta_yaw)*(vel_y*delta_time - pos_y + vr_y*delta_time);
+        double delta_pos_y = pos_y - sin(delta_yaw)*(vel_x*delta_time - pos_x + vr_x*delta_time) + cos(delta_yaw)*(vel_y*delta_time - pos_y + vr_y*delta_time);
+        // 速度
+        float Vox = delta_pos_x/delta_time;
+        float Voy = delta_pos_y/delta_time;
         //
-        rotClstr.twist[k].linear.x -= v_rot_x;
-        rotClstr.twist[k].linear.y -= v_rot_y;
+        // rotClstr.twist[k].linear.x -= v_rot_x;
+        // rotClstr.twist[k].linear.y -= v_rot_y;
+        // rotClstr.twist[k].linear.x += v_rot_x;
+        // rotClstr.twist[k].linear.y += v_rot_y;
+        // rotClstr.twist[k].linear.x = v_rot_x + clstr.twist[k].linear.x;
+        // rotClstr.twist[k].linear.y = v_rot_y + clstr.twist[k].linear.y;
+        rotClstr.twist[k].linear.x = Vox;
+        rotClstr.twist[k].linear.y = Voy;
         //
         marker.ns = "obstacle_vec_self";
         marker.type = visualization_msgs::Marker::ARROW;
@@ -1248,6 +1273,20 @@ void obstacleAvoidance::rotationVelocityChecker(double omega){
         marker.color.r = 0.0;
         marker.color.g = 1;
         marker.color.b = 0;
+        markerArray.markers[count++] = marker;
+        marker.ns = "obstacle_rotVel_text";
+        //text rotVel
+        marker.color.a = 1.0;
+        marker.color.r = 1.0;
+        marker.color.g = 1;
+        marker.color.b = 1;
+        marker.scale.x = 0.5;
+        marker.scale.y = 0.5;
+        marker.scale.z = 0.4;
+        marker.pose.position.z = clstr.data[k].gc.z+1.0;
+        marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+        marker.text = "xy:("+ std::to_string(v_rot_x) +","+ std::to_string(v_rot_y)+")" ;
+        marker.id = count;
         markerArray.markers[count++] = marker;
     }
     //
