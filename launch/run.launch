@@ -9,8 +9,9 @@
   <arg name="obstacleAvoidance/angleMin" default="45"/>
   <arg name="obstacleAvoidance/angleMax" default="135"/>
   <arg name="obstacleAvoidance/angleDiv" default="1.0"/>
-  <arg name="obstacleAvoidance/maxSpeed" default="0.4"/>
-  <arg name="obstacleAvoidance/defaultSpeed" default="0.2"/>
+  <arg name="obstacleAvoidance/maxSpeed" default="0.30"/>
+  <arg name="obstacleAvoidance/minSpeed" default="0.10"/>
+  <arg name="obstacleAvoidance/defaultSpeed" default="0.3"/>
   <!-- ゴール位置 -->
   <arg name="obstacleAvoidance/goalX" default="0.0"/>
   <arg name="obstacleAvoidance/goalY" default="6.0"/>
@@ -30,7 +31,7 @@
   <arg name="obstacleAvoidance/safeRange" default="1.2"/>
   <!-- 探査範囲 -->
   <arg name="obstacleAvoidance/searchRange_vel" default="0.2"/>
-  <arg name="obstacleAvoidance/searchDiv_vel" default="0.02"/>
+  <arg name="obstacleAvoidance/searchDiv_vel" default="0.01"/>
   <!-- debug -->
   <arg name="obstacleAvoidance/debugType" default="1"/>
   <arg name="robot_name" default="robot2"/>
@@ -46,6 +47,7 @@
     <param name="obstacleAvoidance/angleMax" value="$(arg obstacleAvoidance/angleMax)"/>
     <param name="obstacleAvoidance/angleDiv" value="$(arg obstacleAvoidance/angleDiv)"/>
     <param name="obstacleAvoidance/maxSpeed" value="$(arg obstacleAvoidance/maxSpeed)"/>
+    <param name="obstacleAvoidance/minSpeed" value="$(arg obstacleAvoidance/minSpeed)"/>
     <param name="obstacleAvoidance/defaultSpeed" value="$(arg obstacleAvoidance/defaultSpeed)"/>
     <!-- ゴール位置 -->
     <param name="obstacleAvoidance/goalX" value="$(arg obstacleAvoidance/goalX)"/>

@@ -52,7 +52,7 @@ class obstacleAvoidance{
         //--ロボットパラメータ
         float d;//車輪間隔の半分
         float robotRadius;//ロボット半径
-        float max_speed;
+        float max_speed,min_speed;
         float default_speed;
         //--vfh
         float marginRadius;//マージン半径
@@ -63,6 +63,9 @@ class obstacleAvoidance{
         float k_prevAngle, eta_prevAngle;//現在の角速度と目標角速度に対する重み
         float k_vel,eta_vel;//速度加減速に対する重み
         float safe_range;
+        float crossWeightX;
+        float crossWeightY;
+        float timeBias;
         //
     	std::vector<crossPoint> crsPts;
         float goal_x, goal_y;
@@ -78,7 +81,7 @@ class obstacleAvoidance{
         // デバッグ用
 		ros::NodeHandle nhDeb;
         ros::Publisher pubDebPcl,pubDebCross,pubDebMarkerArray, pubDebHst,pubDebOutput,pubDebCPVFHOutput,pubDebBagOutput;
-        ros::Publisher pubDebRotOutput,pubDebOdom;
+        ros::Publisher pubDebRotOutput,pubDebOdom,pubRotVel;
         int debugType;
         //カラーリスト
         float colors[12][3] ={{1.0,0,1.0},{1.0,1.0,0},{0,1.0,1.0},{1.0,0,0},{0,1.0,0},{0,0,1.0},{0.5,1.0,0},{0,0.5,1.0},{0.5,0,1.0},{1.0,0.5,0},{0,1.0,0.5},{1.0,0,0.5}};//色リスト
@@ -214,5 +217,6 @@ class obstacleAvoidance{
         void publish_deltaRobotOdom();
         void rotationVelocityChecker(double omega);
         void debug_trans_rotation_vel(double& v_rot_x, double& v_rot_y, const double& x_para_x,const double& x_para_y,const double& x_para_theta,const double& x_para_vx,const double& x_para_vy, const double& omega_base);
+        void display_rotVel();
 };
 #endif

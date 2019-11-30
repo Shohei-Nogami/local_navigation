@@ -11,6 +11,7 @@ void obstacleAvoidance::setLaunchParam(){
     n.getParam("obstacleAvoidance/angleMax", angle_max);
     n.getParam("obstacleAvoidance/angleDiv", angle_div);
     n.getParam("obstacleAvoidance/maxSpeed", max_speed);
+    n.getParam("obstacleAvoidance/minSpeed", min_speed);
     n.getParam("obstacleAvoidance/defaultSpeed", default_speed);
     //ゴール位置
     n.getParam("obstacleAvoidance/goalX", goal_x);
@@ -62,6 +63,9 @@ void obstacleAvoidance::configCallback(local_navigation::obstacleAvoidanceConfig
     eta_vel = config.EtaVel;
     //
     safe_range = config.safeRange;
+    crossWeightX = config.crossWeightX;
+    crossWeightY = config.crossWeightY;
+    timeBias = config.timeBias;
 	//デバッグ
     debugType = config.debugType;
     //クロスポイントチェッカー

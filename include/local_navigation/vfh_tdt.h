@@ -178,7 +178,45 @@ class vfh_tdt : public vfh
             //そのノードが最良ノードであるといえる
             // std::cout<<"openNode[0].depth:"<<openNode[0].depth<<std::endl;
             // std::cout<<"node_depth:"<<node_depth<<std::endl;
+            if((int)openNode.size()==0){
+                return true;
+            }
             return ( openNode[0].depth + 1 >= node_depth ? true : false);
+        }
+        int get_best_node(){
+            if((int)openNode.size()==0){
+                //クローズドノード内で最も深いノードを取得
+                //深さでソート
+                std::sort(closedNode.begin(),closedNode.end(), [](const cost_node& a, const cost_node& b) {
+                    return (a.depth > b.depth);
+                });//降順ソート
+                //ノード深く、コストが最も低いノードのベストノードとする
+                int count=0;
+                int best_node_num = closedNode[count].num;
+                double best_node_cost = closedNode[count].cost;
+                int max_depth = closedNode[count++].depth;
+                if(max_depth == 0){
+                    return(0);
+                }
+                else{
+                    int ref_depth = closedNode[count].depth;
+                    while(ros::ok()&&max_depth == ref_depth){
+                        //コスト比較
+                        int ref_node_cost = closedNode[count].cost;
+                        if(best_node_cost > ref_node_cost){
+                            best_node_num = closedNode[count].num;
+                            best_node_cost = closedNode[count].cost;
+                        }
+                        //次の参照値
+                        count++;
+                        ref_depth = closedNode[count].depth;
+                    }
+                }
+                return best_node_num;
+            }
+            else{
+                return(openNode[0].num);
+            }
         }
         cost_node& get_node(int Num){
             return openNode[Num];
@@ -324,6 +362,9 @@ class vfh_tdt : public vfh
             //先頭から挿入
             auto it = nextNodeIndex.begin();
             it = nextNodeIndex.insert(it, nodeNum);
+            if(preNodeNum == -1){
+                return nodeNum;
+            }
             //先頭からのインデックスを作成
             while (preNodeNum != 0)
             {
