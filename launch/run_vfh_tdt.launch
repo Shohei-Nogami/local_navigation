@@ -19,11 +19,11 @@
   <arg name="vfh_tdt/eta3" default="1"/>
   <arg name="vfh_tdt/angleMin" default="45"/>
   <arg name="vfh_tdt/angleMax" default="135"/>
-  <arg name="vfh_tdt/angleDiv" default="1"/>
+  <arg name="vfh_tdt/angleDiv" default="4"/>
   <arg name="vfh_tdt/distanceThreshold" default="1"/>
   <arg name="vfh_tdt/marginRadius" default="0.2"/>
   <arg name="vfh_tdt/node_depth" default="1"/>
-  <arg name="vfh_tdt/delta_step" default="1"/>
+  <arg name="vfh_tdt/delta_step" default="0.5"/>
   <!-- debug -->
   <arg name="vfh_tdt/loopFPS" default="1.0"/>
   <!-- <arg name="vfh_tdt/debugGoalPosX" default="2.0"/>

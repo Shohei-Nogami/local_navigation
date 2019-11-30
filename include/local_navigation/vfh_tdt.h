@@ -489,7 +489,7 @@ class vfh_tdt : public vfh
                     float disTemp = sqrt(pow(point_difx,2.0) + pow(point_dify,2.0));
                     //距離に応じてブロック範囲を変更する
                     int blockNum;
-                    if(disTemp > dis_threshold ){
+                    if(disTemp > robotRadius+marginRadius ){
                         double blockAng = atan2((robotRadius+marginRadius), disTemp);
                         blockNum = (int)(blockAng/angle_div)+1;
                     }
@@ -503,7 +503,7 @@ class vfh_tdt : public vfh
                     }
                     int n = transform_angle_RobotToNum(angleTemp);
                     for(int i = n-blockNum/2; i <= n+blockNum/2; i++){
-                        if(i<0 || i>(int)hst_bi.size()){
+                        if(i<0 || i>=(int)hst_bi.size()){
                             continue;
                         }
                         hst_bi[i] = false;
@@ -669,7 +669,7 @@ class vfh_tdt : public vfh
                     }
                     int n = transform_angle_RobotToNum(angleTemp);
                     for(int i = n-blockNum/2; i <= n+blockNum/2; i++){
-                        if(i<0 || i>(int)hst_bi.size()){
+                        if(i<0 || i>=(int)hst_bi.size()){
                             continue;
                         }
                         hst_bi[i] = false;
