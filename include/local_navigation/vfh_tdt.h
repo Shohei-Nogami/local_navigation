@@ -487,9 +487,12 @@ class vfh_tdt : public vfh
                     float point_dify = point_y - point_yr;
                     float angleTemp = atan2(point_dify, point_difx);
                     float disTemp = sqrt(pow(point_difx,2.0) + pow(point_dify,2.0));
-                    //距離に応じてブロック範囲を変更する
+                    //距離に応じてブロック範囲を変更する(ノード深さゼロを除く)
                     int blockNum;
-                    if(disTemp > robotRadius+marginRadius ){
+                    if(disTemp > distance_threshold){
+                        continue;
+                    }
+                    if(disTemp > robotRadius+marginRadius || pNode.depth==0){
                         double blockAng = atan2((robotRadius+marginRadius), disTemp);
                         blockNum = (int)(blockAng/angle_div)+1;
                     }

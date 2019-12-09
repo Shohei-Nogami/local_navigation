@@ -185,8 +185,8 @@ class run{
         void robotEncoder_callback(const beego_control::beego_encoder::ConstPtr& msg){
             //データをコピー
             robotEncoder = *msg;
-            cur_vel = (robotEncoder.vel.r + robotEncoder.vel.l)/2;
-            cur_angVel = (robotEncoder.vel.r - robotEncoder.vel.l)/( d);
+            cur_vel = ((-robotEncoder.vel.r)  + robotEncoder.vel.l)/2;
+            cur_angVel = ((-robotEncoder.vel.r)  - robotEncoder.vel.l)/( d);
             RECEIVED_ROBOT_ENCODAR = true;
             main_process();
         }
@@ -492,7 +492,8 @@ class run{
                 int node_num = vfhTDT.get_min_cost_node();
                 // ROS_INFO("check_search_finish");
                 if(vfhTDT.check_search_finish()){
-                    best_node_num = node_num;
+                    best_node_num = vfhTDT.get_best_node();
+                    // best_node_num = node_num;
                     break;
                 }
                 // ROS_INFO("add_node");
