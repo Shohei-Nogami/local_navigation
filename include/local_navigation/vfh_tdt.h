@@ -644,21 +644,33 @@ class vfh_tdt : public vfh
             //ロボット位置
             float point_xr = pNode.dx;
             float point_yr = pNode.dy;
+            std::cout<<"depth:"<<pNode.depth<<"--("<<point_xr<<","<<point_yr<<") ["<< ds/pNode.v*pNode.depth<<"]\n";
             //
             for(int k =0; k < debug_clstr.data.size(); k++){//クラスタ数
                 //各クラスタに含まれる点群を取得しヒストグラムを作成
+                // float gcX = debug_clstr.data[k].gc.x + debug_clstr.twist[k].linear.x * ds/pNode.v*pNode.depth;
+                // float gcY = debug_clstr.data[k].gc.y + debug_clstr.twist[k].linear.y * ds/pNode.v*pNode.depth;
+                // std::cout<<"(gc),(Xr)--(dx)"<<k<<":("<<gcX<<","<<gcY<<"),("<<point_xr<<","<<point_yr<<")--("<<gcX-point_xr<<","<<gcY-point_yr<<")\n";
+                // std::cout<<"dis,angle clstr "<<k<<":("<<sqrt(pow(gcX-point_xr,2.0) + pow(gcY-point_yr,2.0))<<","<<atan2(gcY-point_yr,gcX-point_xr)<<")\n";
                 for(int m = 0; m < debug_clstr.data[k].pt.size(); m++){
                     //障害物
-                    // std::cout<< debug_clstr.data[k].pt[m].x<<","<< debug_clstr.data[k].pt[m].y<<std::endl;
+                    // std::cout<< debug_clstr.data[k].pt[m].x<<","<< debug_clstr.data[k].pt[m].y<<" -- "<<ds/pNode.v*pNode.depth<<std::endl;
                     float point_x = debug_clstr.data[k].pt[m].x + debug_clstr.twist[k].linear.x * ds/pNode.v*pNode.depth;
                     float point_y = debug_clstr.data[k].pt[m].y + debug_clstr.twist[k].linear.y * ds/pNode.v*pNode.depth;
+                    // float point_x = debug_clstr.data[k].pt[m].x + debug_clstr.twist[k].linear.y * ds/pNode.v*pNode.depth;
+                    // float point_y = debug_clstr.data[k].pt[m].y + (-debug_clstr.twist[k].linear.x) * ds/pNode.v*pNode.depth;
                     float point_difx = point_x - point_xr;
                     float point_dify = point_y - point_yr;
-                    float angleTemp = atan2(point_dify, point_difx);
+                    float angleTemp = atan2(point_dify, point_difx) + (pNode.target_angle-startNode.target_angle);
                     float disTemp = sqrt(pow(point_difx,2.0) + pow(point_dify,2.0));
                     //距離に応じてブロック範囲を変更する
                     int blockNum;
                     if(disTemp > dis_threshold ){
+                        // double blockAng = atan2((robotRadius+marginRadius), disTemp);
+                        // blockNum = (int)(blockAng/angle_div)+1;
+                        continue;
+                    }
+                    else if(disTemp > robotRadius+marginRadius ){
                         double blockAng = atan2((robotRadius+marginRadius), disTemp);
                         blockNum = (int)(blockAng/angle_div)+1;
                     }
