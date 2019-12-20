@@ -644,7 +644,7 @@ class vfh_tdt : public vfh
             //ロボット位置
             float point_xr = pNode.dx;
             float point_yr = pNode.dy;
-            std::cout<<"depth:"<<pNode.depth<<"--("<<point_xr<<","<<point_yr<<") ["<< ds/pNode.v*pNode.depth<<"]\n";
+            // std::cout<<"depth:"<<pNode.depth<<"--("<<point_xr<<","<<point_yr<<") ["<< ds/pNode.v*pNode.depth<<"]\n";
             //
             for(int k =0; k < debug_clstr.data.size(); k++){//クラスタ数
                 //各クラスタに含まれる点群を取得しヒストグラムを作成

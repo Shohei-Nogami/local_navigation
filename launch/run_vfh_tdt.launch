@@ -6,7 +6,7 @@
   <arg name="vfh_tdt/robotRadius" default="0.3125"/>
   <arg name="vfh_tdt/robotSteerRadius" default="0.3145"/>
   <arg name="vfh_tdt/controllerGainP" default="0.01"/>
-  <arg name="vfh_tdt/default_vel" default="0.2"/>
+  <arg name="vfh_tdt/default_vel" default="0.3"/>
   <!-- ゴール位置 -->
   <arg name="vfh_tdt/goalX" default="0.0"/>
   <arg name="vfh_tdt/goalY" default="6.0"/>
